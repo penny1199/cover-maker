@@ -3,7 +3,7 @@
 <head data-page-node-id="fEcj8DAs8RT8bsULxBiVcM">
 <meta charset="UTF-8" data-page-node-id="OjyaaNKUjXHFLqAJkFoOoC">
 <meta name="viewport" content="width=device-width, initial-scale=1" data-page-node-id="hRLXVZguPzllBP1EoZAMXQ">
-<title>封面标题工作台 · 公众号 / 视频号 / 小红书 / B站</title>
+<title>一次出5个平台封面 字不被切 标题不残缺 · 公众号 / 视频号 / 小红书 / B站</title>
 <style>
   :root{
     --bg:#f2f3f5;--card:#fff;--text:#1a1a1a;--sub:#9a9a9a;--line:#e8e8e8;--green:#07c160;
@@ -12,9 +12,35 @@
   *{box-sizing:border-box;}
   body{margin:0;padding:22px 16px 60px;background:var(--bg);color:var(--text);font-family:var(--font);font-size:15px;line-height:1.6;}
   .wrap{max-width:1160px;margin:0 auto;}
-  header{margin-bottom:16px;}
-  h1{font-size:22px;margin:0 0 6px;letter-spacing:-.2px;}
-  header p{margin:0;color:var(--sub);font-size:13px;}
+  /* ===== 顶部横幅 ===== */
+  header{position:relative;overflow:hidden;margin-bottom:18px;border-radius:18px;padding:26px 28px 24px;
+    background:linear-gradient(118deg,#07c160 0%,#05a86e 45%,#0b8f9c 100%);
+    box-shadow:0 10px 26px rgba(7,193,96,.22);}
+  header::before,header::after{content:"";position:absolute;border-radius:50%;pointer-events:none;}
+  header::before{width:280px;height:280px;right:-80px;top:-140px;background:rgba(255,255,255,.14);}
+  header::after{width:190px;height:190px;right:110px;bottom:-130px;background:rgba(255,255,255,.10);}
+  .hmark{width:36px;height:36px;border-radius:11px;background:rgba(255,255,255,.22);
+    border:1px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;flex:none;}
+  h1{margin:0;}
+  h1 .htxt{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;}
+  /* 立体大标题：横向铺满整个绿色横幅（手机上也用同一套立体字，保持一致） */
+  .bigtitle{display:block;position:relative;margin:0 -14px;}
+  .bigtitle svg{display:block;width:100%;height:auto;filter:drop-shadow(0 5px 9px rgba(0,0,0,.22));}
+  .bigtitle .face{font:800 62px var(--font);fill:url(#ttFace);stroke:rgba(255,255,255,.55);stroke-width:1.2;paint-order:stroke fill;}
+  .bigtitle .ai{fill:url(#ttAI);stroke:rgba(255,255,255,.9);stroke-width:1.5;}
+  .bigtitle .side{font:800 62px var(--font);fill:url(#ttSide);}
+  .hsub{display:flex;align-items:center;gap:11px;position:relative;margin-top:6px;}
+  .hsub p{margin:0;}
+  @media (max-width:900px){ .hsub{align-items:flex-start;} .hsub .hmark{margin-top:2px;} }
+  header p{margin:10px 0 0;color:rgba(255,255,255,.92);font-size:13.5px;max-width:660px;position:relative;}
+  .hbadges{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;position:relative;}
+  .hbadge{font-size:12px;color:#fff;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.28);
+    padding:4px 11px;border-radius:999px;}
+  /* 预览栏吸顶：左边往下翻，右边的图一直看得见 */
+  .box.stay{position:sticky;top:16px;max-height:calc(100vh - 34px);overflow-y:auto;}
+  /* 竖版尺寸（视频号/小红书）也不让预览超出屏幕，按钮始终露出来 */
+  .box.stay canvas{width:auto;height:auto;max-width:100%;max-height:calc(100vh - 300px);margin:0 auto;}
+  @media (max-width:900px){.box.stay{position:static;max-height:none;overflow:visible;}}
   .tabs{display:flex;gap:8px;margin:16px 0;flex-wrap:wrap;}
   .tab{padding:8px 20px;border-radius:999px;background:#fff;border:1px solid var(--line);cursor:pointer;font-size:14px;color:#666;user-select:none;}
   .tab.on{background:var(--green);border-color:var(--green);color:#fff;font-weight:600;}
@@ -116,8 +142,45 @@
 <body data-page-node-id="L8ptQgd7pDRNJIKhPNeTHK">
 <div class="wrap" data-page-node-id="RIP5oSr8HaNwk5ahl91dns">
   <header data-page-node-id="Gg7xfYwcVa1I5lBILo3UAw">
-    <h1 data-page-node-id="TPJTHBgKh0TU0QpJzjl2HN">封面标题工作台</h1>
-    <p data-page-node-id="DMExTo0br4JlsnfV1ETXsB">做封面、看标题真实效果、存草稿，一个页面全干完。公众号 / 视频号 / 小红书 / B站通用。</p>
+    <h1 data-page-node-id="TPJTHBgKh0TU0QpJzjl2HN">
+      <span class="htxt">一次出5个平台封面 字不被切 标题不残缺</span>
+      <span class="bigtitle" aria-hidden="true">
+        <svg viewBox="0 0 1000 92" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <linearGradient id="ttFace" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#ffffff"></stop>
+              <stop offset="40%" stop-color="#fff3c0"></stop>
+              <stop offset="75%" stop-color="#ffd257"></stop>
+              <stop offset="100%" stop-color="#ff9f2e"></stop>
+            </linearGradient>
+            <linearGradient id="ttAI" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#ffffff"></stop>
+              <stop offset="45%" stop-color="#d6fff3"></stop>
+              <stop offset="100%" stop-color="#3fe0bd"></stop>
+            </linearGradient>
+            <linearGradient id="ttSide" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#0c7050"></stop>
+              <stop offset="100%" stop-color="#02402c"></stop>
+            </linearGradient>
+          </defs>
+          <text class="side" x="0" y="83" textLength="1000" lengthAdjust="spacingAndGlyphs">一次出5个平台封面 字不被切 标题不残缺</text>
+          <text class="side" x="0" y="78.5" textLength="1000" lengthAdjust="spacingAndGlyphs">一次出5个平台封面 字不被切 标题不残缺</text>
+          <text class="side" x="0" y="74" textLength="1000" lengthAdjust="spacingAndGlyphs">一次出5个平台封面 字不被切 标题不残缺</text>
+          <text class="face" x="0" y="70" textLength="1000" lengthAdjust="spacingAndGlyphs">一次出5个平台封面 字不被切 标题不残缺</text>
+        </svg>
+      </span>
+    </h1>
+    <div class="hsub">
+      <div class="hmark"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"></rect><circle cx="8.4" cy="8.4" r="1.5" fill="#fff" stroke="none"></circle><path d="M21 15.5l-4.6-4.6L5.4 21"></path></svg></div>
+      <p data-page-node-id="DMExTo0br4JlsnfV1ETXsB">公众号 / 视频号 / 小红书 / B站 · 多平台封面图、看标题真实效果</p>
+    </div>
+    <div class="hbadges">
+      <span class="hbadge">6 种尺寸预设</span>
+      <span class="hbadge">在线搜图配图</span>
+      <span class="hbadge">8 套行业模板</span>
+      <span class="hbadge">一键出首图 + 次图</span>
+      <span class="hbadge">草稿存在本机</span>
+    </div>
   </header>
 
   <div class="tabs" data-page-node-id="PCXZdXPRpI3BMHAYo0bqI5">
@@ -274,6 +337,7 @@
         <label data-page-node-id="9q7pCbQkiMrhEGThdW1UPF">排版</label>
         <div class="segs" id="al" data-page-node-id="iC4fJotXx00IEBQ9yFSNlL">
           <div class="seg on" data-v="center" data-page-node-id="rmaZ9Cf983bIOAPWAMNeOp">居中</div>
+          <div class="seg" data-v="bottomcenter">底部居中</div>
           <div class="seg" data-v="bottom" data-page-node-id="qy5fyhsx4dMjgrsgG6dFu5">底部靠左</div>
           <div class="seg" data-v="topleft" data-page-node-id="oBxJgK0GC17FM4T6Gldt9o">左上</div>
         </div>
@@ -282,7 +346,7 @@
         <div class="btns" data-page-node-id="FPXxRkjwGgxkcNzuzg1gN7"><button class="btn ghost" id="demo" data-page-node-id="stE0HxAzonMSUlNNaM3TAj">换个示例</button></div>
       </div>
 
-      <div class="box" data-page-node-id="lHF2vOy41dymGbA8obDRYI">
+      <div class="box stay" data-page-node-id="lHF2vOy41dymGbA8obDRYI">
         <h2 data-page-node-id="0rMofdndYqjIPJbSlGoTtj">预览</h2>
         <canvas id="cv" data-page-node-id="HJNfo2MI4YwvWQ7TsAKfA6"></canvas>
         <div class="btns" data-page-node-id="OEo6HgNYXg5Cy8LNiwBIF6">
@@ -319,7 +383,7 @@
         <textarea id="batch" style="min-height:120px;"></textarea>
         <div class="btns" data-page-node-id="wKFGLV6ANBSauOk3NKJsGq"><button class="btn" id="run" data-page-node-id="usdloV7GxtMlejwIFH0ZUI">开始对比</button></div>
       </div>
-      <div class="box" data-page-node-id="twCJ8VRwemTWdFPAUSYTIU">
+      <div class="box stay" data-page-node-id="twCJ8VRwemTWdFPAUSYTIU">
         <h2 data-page-node-id="HTXXPHyhZpvJsus2YzLcrZ">它在读者手机里长这样</h2>
         <div id="scenes" data-page-node-id="CU46GAFx1J3DSrD4oEl7F5"></div>
         <div class="stat" id="stats" data-page-node-id="7WmNHH1BSLjc7jXg317bd8"></div>
@@ -512,8 +576,12 @@
     } else { c.shadowColor='transparent'; c.shadowBlur=0; c.shadowOffsetY=0; }
 
     var totalH=res.lines.length*res.size*lh, startY, x;
-    if(state.al==='bottom'){
-      c.textAlign='left'; startY=s.h-padY-totalH+(res.size*lh)/2; x=padX;
+    // 底部两种排版都要避开「被平台盖住」的区域（视频号 26%、小红书 16%、B站 12%）
+    var zb=(SAFE[key]||SAFE.cover).b;
+    var padBottom=Math.max(padY,s.h*(zb+0.02));
+    if(state.al==='bottom'||state.al==='bottomcenter'){
+      startY=s.h-padBottom-totalH+(res.size*lh)/2;
+      if(state.al==='bottomcenter'){ c.textAlign='center'; x=s.w/2; } else { c.textAlign='left'; x=padX; }
     } else if(state.al==='topleft'){
       c.textAlign='left'; startY=padY+subH+(res.size*lh)/2; x=padX;
     } else {
@@ -819,7 +887,7 @@
     if(!key){ fallback(''); return; }
     var base=document.getElementById('abase').value.trim(), model=document.getElementById('amodel').value.trim()||'deepseek-chat';
     var prompt='你是公众号封面设计师。根据标题和关键词，输出 4 套封面设计方案，只输出 JSON 数组，不要解释、不要 markdown 代码块。\n'+
-      '每套字段：name(方案名,4-6字), desc(一句话说明,15字内), bgm("grad"或"solid"), gradIndex(0-7整数), bgColor("#rrggbb"), weight(400/600/800/900之一), font("sans"/"serif"/"kai"/"hei"), align("center"/"bottom"/"topleft"), mask(0到0.85的小数), mks("uniform"/"bottom")。\n'+
+      '每套字段：name(方案名,4-6字), desc(一句话说明,15字内), bgm("grad"或"solid"), gradIndex(0-7整数), bgColor("#rrggbb"), weight(400/600/800/900之一), font("sans"/"serif"/"kai"/"hei"), align("center"/"bottomcenter"/"bottom"/"topleft"), mask(0到0.85的小数), mks("uniform"/"bottom")。\n'+
       '标题：'+t+'\n关键词：'+kw;
     fetch(base,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
       body:JSON.stringify({model:model,messages:[{role:'user',content:prompt}],temperature:0.8})})
@@ -835,7 +903,7 @@
             mask:typeof o.mask==='number'?o.mask:0.35, mks:o.mks||'uniform', fs:'auto', main:text};
           if(!isFinite(cfg.grad)||cfg.grad<0||cfg.grad>7) cfg.grad=0;
           if(['sans','serif','kai','hei'].indexOf(cfg.ff)<0) cfg.ff='sans';
-          if(['center','bottom','topleft'].indexOf(cfg.al)<0) cfg.al='center';
+          if(['center','bottomcenter','bottom','topleft'].indexOf(cfg.al)<0) cfg.al='center';
           if([400,600,800,900].indexOf(cfg.weight)<0) cfg.weight=800;
           return {name:o.name||('方案'+(i+1)), desc:o.desc||'', cfg:cfg, thumb:schemeThumb(cfg,text)};
         });
@@ -1303,6 +1371,54 @@
   updateCount();
   preview();
   renderBatch();
+})();
+</script>
+<script>
+/* 立体大标题自适应：无论标题多少字，都精确铺满横幅宽度，且横向不被压扁 */
+(function(){
+  var svg=document.querySelector('.bigtitle svg');
+  if(!svg) return;
+  function fit(){
+    var ts=svg.querySelectorAll('text');
+    if(ts.length<2) return;
+    var face=null, sides=[];
+    for(var i=0;i<ts.length;i++){
+      if(ts[i].getAttribute('class')==='face') face=ts[i]; else sides.push(ts[i]);
+    }
+    if(!face) return;
+    try{
+      var tl=face.getAttribute('textLength');
+      face.removeAttribute('textLength');
+      var nat=face.getComputedTextLength();
+      if(tl) face.setAttribute('textLength',tl);
+      if(!nat||!isFinite(nat)) return;
+      var fs=parseFloat(window.getComputedStyle(face).fontSize)||62;
+      var want=fs*1000/nat;
+      want=Math.max(34,Math.min(80,want));
+      if(Math.abs(want-fs)>0.2){
+        for(var j=0;j<ts.length;j++) ts[j].style.fontSize=want.toFixed(2)+'px';
+        fs=want;
+      }
+      var k=[0.065,0.137,0.21];
+      face.setAttribute('y',0);
+      for(var s=0;s<sides.length;s++) sides[s].setAttribute('y',(fs*(k[s]||0.065)).toFixed(2));
+      var x0=1e9,y0=1e9,x1=-1e9,y1=-1e9,ok=false;
+      for(var m=0;m<ts.length;m++){
+        var b=null; try{ b=ts[m].getBBox(); }catch(e){}
+        if(!b||!b.width) continue;
+        ok=true;
+        if(b.x<x0) x0=b.x; if(b.y<y0) y0=b.y;
+        if(b.x+b.width>x1) x1=b.x+b.width;
+        if(b.y+b.height>y1) y1=b.y+b.height;
+      }
+      if(!ok) return;
+      var padX=8,padTop=7,padBot=9;
+      svg.setAttribute('viewBox',(x0-padX).toFixed(1)+' '+(y0-padTop).toFixed(1)+' '+(x1-x0+padX*2).toFixed(1)+' '+(y1-y0+padTop+padBot).toFixed(1));
+    }catch(e){}
+  }
+  fit();
+  window.addEventListener('load',fit);
+  if(document.fonts&&document.fonts.ready) document.fonts.ready.then(fit);
 })();
 </script>
 </body>
