@@ -74,6 +74,7 @@
   .btn.ghost{background:#fff;color:#555;border:1px solid var(--line);}
   .btn.small{padding:8px 14px;font-size:13px;}
   .btn:hover{opacity:.9;}
+  .btn:disabled{opacity:.45;cursor:default;}
   .filebtn{display:inline-block;padding:9px 16px;border-radius:9px;background:#fafafa;border:1px dashed #c9c9c9;color:#555;font-size:13px;cursor:pointer;}
   .filebtn:hover{border-color:var(--green);color:var(--green);}
   .tip{margin-top:12px;padding:12px 14px;border-radius:10px;background:#f6f7f9;font-size:13px;color:#666;line-height:1.8;}
@@ -86,6 +87,9 @@
   .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px;}
   .grid4 img{width:100%;height:66px;object-fit:cover;border-radius:7px;cursor:pointer;border:2px solid transparent;}
   .grid4 img.on{border-color:var(--green);}
+  .gridq{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px;}
+  .gridq img{width:100%;height:108px;object-fit:cover;border-radius:8px;cursor:pointer;border:2px solid transparent;background:#eee;}
+  .gridq img.on{border-color:var(--green);box-shadow:0 0 0 2px rgba(29,131,72,.18);}
   .qchips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
   .qchip{padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:12.5px;color:#555;cursor:pointer;}
   .qchip:hover{border-color:var(--green);color:var(--green);}
@@ -261,8 +265,10 @@
         <div class="only" id="p-online" data-page-node-id="2gW6DyDjCtBcA5RbPaKk06">
           <div class="row" style="margin-top:10px;" data-page-node-id="S44XDamD6NJJKKFsTS0p7B">
             <button class="btn ghost small" id="rand" data-page-node-id="uIJbegEDmHxBwkrN3bBmIL">换一张</button>
+            <button class="btn ghost small" id="randprev" disabled data-page-node-id="uIJbegEDmHxBwkrN3bBmIL2">上一张</button>
           </div>
-          <div class="hint" data-page-node-id="pM4QXGQEBiLki1sX0oynP1">联网随机取图。取不出来就是网络问题，改用上传本地图片。</div>
+          <div class="grid4" id="rhist" data-page-node-id="S44XDamD6NJJKKFsTS0p7B2"></div>
+          <div class="hint" data-page-node-id="pM4QXGQEBiLki1sX0oynP1">随机图来自 Pixabay 免费图库（可商用），换过的图会记在下面，点缩略图就能补回来，划过头也不用怕。取不出来就再点一次，或改用「搜图」、上传本地图片。</div>
         </div>
         <div class="only" id="p-search" data-page-node-id="3n67YFhbtKr88ZODWwg7KX">
           <div class="row" style="margin-top:10px;" data-page-node-id="7CDGvY4F5iIYDYkzqeXps1">
@@ -284,7 +290,8 @@
           </div>
           <div class="qchips" id="qhits" data-page-node-id="b93CQa2W6Pcmq6PgOwXYzB"></div>
           <div class="hint" id="qhint" data-page-node-id="5bzOpafKCksKu1A5Q6lKpc">搜到的图来自免费图库，可商用，不用署名。英文关键词命中率更高，也能中英混搜。</div>
-          <div class="grid4" id="qres" data-page-node-id="QPOBbNml8tpSxCdazKovC7"></div>
+          <div class="gridq" id="qres" data-page-node-id="QPOBbNml8tpSxCdazKovC7"></div>
+          <div class="btns" style="margin-top:10px;" data-page-node-id="QPOBbNml8tpSxCdazKovC8"><button class="btn ghost small" id="qmore" style="display:none;" data-page-node-id="QPOBbNml8tpSxCdazKovC9">换一批</button><button class="btn ghost small" id="qprev" style="display:none;" data-page-node-id="QPOBbNml8tpSxCdazKovCA">上一批</button></div>
         </div>
         <div class="only" id="p-imgadj" data-page-node-id="M6Oj2Mtj7dPfJDjEsuyHDJ">
           <label data-page-node-id="llXIOEHuNOwIHMJlfvQi10">图片缩放 <span id="scv" data-page-node-id="tckFkxIXBb8BOw3NFiQAAw">1.0</span>×</label>
@@ -957,55 +964,114 @@
       .then(function(b){ useImage(URL.createObjectURL(b),name); })
       .catch(function(){ alert('这张图取不下来（网络或跨域问题），换一张试试。'); });
   }
-  function renderResults(list){
-    var box=document.getElementById('qres'); box.innerHTML='';
-    if(!list.length){ document.getElementById('qhint').textContent='没搜到，换个词（英文词命中率更高，比如 coffee desk city）。'; return; }
-    document.getElementById('qhint').textContent='搜到 '+list.length+' 张，点一张就用。图来自免费图库，可商用。';
-    list.forEach(function(p){
+  var QBATCH=0, BHIST=[], BPOS=-1;
+  /* 判断一张图和搜索词有多相关：2=标签里含整个词，1=沾边，0=看不出关系 */
+  function scoreOf(p,q){
+    var t=String(p.tags||'').toLowerCase(), s=String(q||'').toLowerCase().trim();
+    if(!s || !t) return 1;
+    if(t.indexOf(s)>=0) return 2;
+    var cj=s.match(/[\u4e00-\u9fa5]/g)||[];
+    if(cj.length>=2){
+      var hit=0; for(var i=0;i<cj.length;i++){ if(t.indexOf(cj[i])>=0) hit++; }
+      if(hit/cj.length>=0.5) return 1;
+    }
+    var ws=s.split(/\s+/).filter(function(w){ return w.length>2; });
+    for(var k=0;k<ws.length;k++){ if(t.indexOf(ws[k])>=0) return 1; }
+    return 0;
+  }
+  /* 把一批结果按相关性排好：先留标签对得上的，不够再退让，保证不会空手而归 */
+  function buildPool(raw,q){
+    var scored=raw.map(function(p){ return {p:p,s:scoreOf(p,q)}; });
+    var good=scored.filter(function(x){ return x.s>=2; });
+    if(good.length<PER) good=scored.filter(function(x){ return x.s>=1; });
+    if(good.length<PER) good=scored;
+    good.sort(function(a,b){ return b.s-a.s; });
+    return good.map(function(x){ return x.p; });
+  }
+  /* 画一批（写进历史，支持「上一批」回看） */
+  function drawBatch(items,no){
+    var box=document.getElementById('qres');
+    box.innerHTML='';
+    items.forEach(function(p){
       var im=document.createElement('img');
-      im.src=p.thumb; im.title=p.by||'';
+      im.src=p.thumb; im.title=p.by||''; im.loading='lazy';
+      if(SQ.selThumb && p.thumb===SQ.selThumb) im.className='on';
       im.addEventListener('click',function(){
         box.querySelectorAll('img').forEach(function(x){x.classList.remove('on');});
-        im.classList.add('on'); loadRemote(p.full,(p.by||'在线图'));
+        im.classList.add('on'); SQ.selThumb=p.thumb; loadRemote(p.full,(p.by||'在线图'));
       });
       box.appendChild(im);
     });
+    document.getElementById('qhint').textContent='第 '+no+' 批，'+items.length+' 张 · 都来自「'+SQ.q+'」的搜索结果。点一张就用；想换点「换一批」，想回头点「上一批」。';
+    setPrevBtn();
   }
-  var QCACHE='cover_studio_qcache_v1';
+  function setPrevBtn(){
+    var b=document.getElementById('qprev');
+    if(!b) return;
+    b.style.display = BHIST.length ? 'inline-block' : 'none';
+    b.disabled = BPOS<=0;
+  }
+  /* 从池子里取接下来的 6 张显示（原地替换，不留旧的） */
+  function renderSlice(){
+    var out=[];
+    while(SQ.pi<SQ.pool.length && out.length<PER){
+      var p=SQ.pool[SQ.pi++];
+      if(SQ.seen[p.thumb]) continue;
+      SQ.seen[p.thumb]=1; out.push(p);
+    }
+    if(!out.length) return out;
+    QBATCH++;
+    BHIST=BHIST.slice(0,BPOS+1);
+    BHIST.push({items:out,no:QBATCH});
+    BPOS=BHIST.length-1;
+    drawBatch(out,QBATCH);
+    return out;
+  }
+  var QCACHE='cover_studio_qcache_v3';
   function qcacheGet(k){
     try{ var o=JSON.parse(localStorage.getItem(QCACHE)||'{}'), v=o[k];
-      if(v && v.list && v.list.length && (Date.now()-v.t)<864e5) return v.list; }catch(e){}
+      if(v && v.pool && v.pool.length && (Date.now()-v.t)<864e5) return v.pool; }catch(e){}
     return null;
   }
-  function qcacheSet(k,list){
+  function qcacheSet(k,pool){
     try{
       var o=JSON.parse(localStorage.getItem(QCACHE)||'{}');
-      o[k]={t:Date.now(),list:list};
+      o[k]={t:Date.now(),pool:pool.slice(0,60)};
       var ks=Object.keys(o);
       if(ks.length>60){ ks.sort(function(a,b){ return o[a].t-o[b].t; }); ks.slice(0,ks.length-60).forEach(function(x){ delete o[x]; }); }
       localStorage.setItem(QCACHE,JSON.stringify(o));
     }catch(e){}
   }
-  function doSearch(q,force){
+  var SQ={q:'',src:'',page:1,pi:0,pool:[],seen:{},ids:{},max:1};
+  var PER=6, POOL=48;
+  function setMoreBtn(show){
+    var m=document.getElementById('qmore'), p=document.getElementById('qprev');
+    if(m) m.style.display=show?'inline-block':'none';
+    if(p){ p.style.display=show?'inline-block':'none'; p.disabled = BPOS<=0; }
+  }
+  function unseenLeft(){
+    var n=0;
+    for(var i=SQ.pi;i<SQ.pool.length;i++){ if(!SQ.seen[SQ.pool[i].thumb]) n++; }
+    return n;
+  }
+  function loadPool(page,isFirst){
     var hint=document.getElementById('qhint');
-    var src=document.getElementById('src').value, key=keyOf(src);
+    var src=SQ.src, key=keyOf(src), q=SQ.q;
     if(!key){ document.getElementById('qkey').style.display='block'; hint.textContent='这一步需要一个免费的 Key，填一次就一直能用（只存在你自己浏览器里）。'; return; }
-    var ck=src+':'+q;
-    if(!force){ var c=qcacheGet(ck); if(c){ renderResults(c); return; } }
-    hint.textContent='正在搜「'+q+'」…';
+    hint.textContent = isFirst ? ('正在搜「'+q+'」…') : '正在取下一批…';
     var url,hdr,pick;
     if(src==='pixabay'){
-      url='https://pixabay.com/api/?key='+encodeURIComponent(key)+'&q='+encodeURIComponent(q)+'&per_page=12&image_type=photo&safesearch=true&lang=zh';
+      url='https://pixabay.com/api/?key='+encodeURIComponent(key)+'&q='+encodeURIComponent(q)+'&per_page='+POOL+'&page='+page+'&image_type=photo&safesearch=true&lang=zh';
       hdr={};
-      pick=function(j){ return (j.hits||[]).map(function(p){ return {thumb:p.webformatURL, full:p.largeImageURL||p.webformatURL, by:p.user}; }); };
+      pick=function(j){ return (j.hits||[]).map(function(p){ return {thumb:p.webformatURL, full:p.largeImageURL||p.webformatURL, by:p.user, tags:p.tags}; }); };
     } else if(src==='unsplash'){
-      url='https://api.unsplash.com/search/photos?per_page=12&query='+encodeURIComponent(q);
+      url='https://api.unsplash.com/search/photos?per_page='+POOL+'&page='+page+'&query='+encodeURIComponent(q);
       hdr={Authorization:'Client-ID '+key};
-      pick=function(j){ return (j.results||[]).map(function(p){ return {thumb:p.urls.thumb, full:p.urls.regular, by:p.user&&p.user.name}; }); };
+      pick=function(j){ return (j.results||[]).map(function(p){ return {thumb:p.urls.thumb, full:p.urls.regular, by:p.user&&p.user.name, tags:(p.alt_description||'')+' '+((p.tags&&p.tags.map)?p.tags.map(function(t){return t.title||'';}).join(' '):'')}; }); };
     } else {
-      url='https://api.pexels.com/v1/search?per_page=12&query='+encodeURIComponent(q);
+      url='https://api.pexels.com/v1/search?per_page='+POOL+'&page='+page+'&query='+encodeURIComponent(q);
       hdr={Authorization:key};
-      pick=function(j){ return (j.photos||[]).map(function(p){ return {thumb:p.src.medium, full:p.src.large2x||p.src.large, by:p.photographer}; }); };
+      pick=function(j){ return (j.photos||[]).map(function(p){ return {thumb:p.src.medium, full:p.src.large2x||p.src.large, by:p.photographer, tags:p.alt||''}; }); };
     }
     fetch(url,{headers:hdr})
       .then(function(r){
@@ -1022,16 +1088,56 @@
         });
       })
       .then(function(j){
-        var list=pick(j);
-        if(list.length) qcacheSet(ck,list);
-        renderResults(list);
+        var raw=pick(j);
+        var tot=j.totalHits||j.total||j.total_results||0;
+        if(tot) SQ.max=Math.max(1, Math.min(20, Math.floor(tot/POOL)));
+        if(page>1) SQ.page=page;
+        var fresh=raw.filter(function(p){ if(SQ.ids[p.thumb]) return false; SQ.ids[p.thumb]=1; return true; });
+        SQ.pool=SQ.pool.concat(buildPool(fresh,q));
+        if(isFirst && page===1) qcacheSet(src+':'+q, SQ.pool);
+        var out=renderSlice();
+        if(!out.length){
+          hint.textContent = SQ.pool.length ? '这个词的图翻完了，换个词试试。' : '没搜到，换个词（英文词命中率更高，比如 coffee desk city）。';
+          setMoreBtn(!!SQ.pool.length); return;
+        }
+        setMoreBtn(true);
       })
       .catch(function(e){ hint.textContent='搜失败了：'+e.message; });
+  }
+  function doSearch(q,force){
+    var src=document.getElementById('src').value;
+    SQ.q=q; SQ.src=src; SQ.page=1; SQ.pi=0; SQ.pool=[]; SQ.seen={}; SQ.ids={}; SQ.max=1; SQ.selThumb='';
+    QBATCH=0; BHIST=[]; BPOS=-1; setPrevBtn();
+    if(!force){
+      var c=qcacheGet(src+':'+q);
+      if(c){ SQ.pool=c; if(renderSlice().length){ setMoreBtn(true); return; } }
+    }
+    loadPool(1,true);
+  }
+  function nextBatch(){
+    if(!SQ.q) return;
+    if(BPOS<BHIST.length-1){ BPOS++; drawBatch(BHIST[BPOS].items,BHIST[BPOS].no); setMoreBtn(true); return; }
+    if(!SQ.pool.length){ loadPool(1,true); return; }
+    if(unseenLeft()<PER && SQ.page<SQ.max){ loadPool(SQ.page+1,false); return; }
+    var out=renderSlice();
+    if(!out.length){ document.getElementById('qhint').textContent='「'+SQ.q+'」的图基本翻完了，换个词试试。'; }
+  }
+  function prevBatch(){
+    if(BPOS<=0) return;
+    BPOS--;
+    drawBatch(BHIST[BPOS].items,BHIST[BPOS].no);
+    setMoreBtn(true);
   }
   document.getElementById('qgo').addEventListener('click',function(){
     var q=(document.getElementById('q').value||'').trim();
     if(!q){ document.getElementById('qhint').textContent='先输入关键词。'; return; }
     doSearch(q,false);
+  });
+  document.getElementById('qmore').addEventListener('click',function(){
+    nextBatch();
+  });
+  document.getElementById('qprev').addEventListener('click',function(){
+    prevBatch();
   });
   var HOTS=[['职场','office'],['咖啡','coffee'],['书桌','desk'],['城市夜景','city night'],['赚钱','money'],['读书','reading'],['安静','quiet'],['路','road']];
   (function initHots(){
@@ -1234,14 +1340,55 @@
   document.getElementById('clr').addEventListener('click',function(){
     state.img=null; document.getElementById('file').value=''; document.getElementById('fname').textContent='还没选图'; preview();
   });
-  document.getElementById('rand').addEventListener('click',function(){
-    var seed=Math.floor(Math.random()*999999);
-    var s=SIZES[state.size];
-    var w=1600,hh=900; if(s.h>s.w){ w=1200; hh=1600; }
-    fetch('https://picsum.photos/seed/'+seed+'/'+w+'/'+hh,{mode:'cors'})
-      .then(function(r){return r.blob();})
-      .then(function(b){ useImage(URL.createObjectURL(b),'在线图 '+seed); })
-      .catch(function(){ alert('取图失败，改用「图片」上传本地文件。'); });
+  var RH=[], RHPOS=-1;
+  var RWORDS=[['城市夜景','city night'],['咖啡','coffee'],['书桌','desk workspace'],['山','mountains'],['海','ocean waves'],['森林','forest'],['天空','sky clouds'],['街道','street'],['灯光','lights bokeh'],['秋天','autumn leaves'],['花','flowers'],['下雨','rain window'],['旅行','travel'],['窗边','window light'],['书','book'],['猫','cat'],['日落','sunset'],['建筑','architecture'],['小路','path road'],['草地','grass field'],['海面','sea horizon'],['雪','snow'],['地铁','subway'],['电脑','laptop desk'],['夜晚的路','night road'],['云','clouds']];
+  function renderRHist(){
+    var box=document.getElementById('rhist');
+    if(!box) return;
+    box.innerHTML='';
+    RH.forEach(function(item,i){
+      var im=document.createElement('img');
+      im.src=item.thumb; im.title='第 '+(i+1)+' 张 · '+(item.by||'');
+      if(i===RHPOS) im.classList.add('on');
+      im.addEventListener('click',function(){ RHPOS=i; renderRHist(); loadRemote(item.full,'在线图 · '+(item.by||'')); });
+      box.appendChild(im);
+    });
+    var pb=document.getElementById('randprev');
+    if(pb) pb.disabled = RHPOS<=0;
+  }
+  function randOne(){
+    var key=keyOf('pixabay');
+    if(!key){ alert('随机图走的是 Pixabay 免费图库通道，需要在「搜图」里填一个 Key（内置的也行）。'); return; }
+    var w=RWORDS[Math.floor(Math.random()*RWORDS.length)];
+    var s=SIZES[state.size], ori=(s && s.h>s.w) ? 'vertical' : 'horizontal';
+    var page=1+Math.floor(Math.random()*3);
+    var hint=document.getElementById('fname');
+    if(hint) hint.textContent='正在取图…';
+    fetch('https://pixabay.com/api/?key='+encodeURIComponent(key)+'&q='+encodeURIComponent(w[1])+'&per_page=20&page='+page+'&image_type=photo&safesearch=true&orientation='+ori)
+      .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+      .then(function(j){
+        var hits=j.hits||[];
+        if(!hits.length) throw new Error('这次没匹配到图');
+        var p=hits[Math.floor(Math.random()*hits.length)];
+        var full=p.largeImageURL||p.webformatURL;
+        RH.push({full:full, thumb:p.webformatURL, by:w[0]});
+        if(RH.length>12) RH=RH.slice(-12);
+        RHPOS=RH.length-1;
+        renderRHist();
+        loadRemote(full,'在线图 · '+w[0]);
+      })
+      .catch(function(e){
+        if(hint) hint.textContent='没取到图，再点一次「换一张」。';
+        alert('取图失败（'+e.message+'）。多半是网络或图库额度，再点一次试试。');
+      });
+  }
+  document.getElementById('rand').addEventListener('click',randOne);
+  document.getElementById('randprev').addEventListener('click',function(){
+    if(RHPOS<=0) return;
+    RHPOS--;
+    renderRHist();
+    var it=RH[RHPOS];
+    if(it) loadRemote(it.full,'在线图 · '+(it.by||''));
   });
   document.getElementById('scale').addEventListener('input',function(e){
     state.imgScale=parseInt(e.target.value,10)/10; document.getElementById('scv').textContent=state.imgScale.toFixed(1); preview();
